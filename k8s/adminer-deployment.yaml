@@ -1,0 +1,26 @@
+# admin.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: adminer
+  namespace: my-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: adminer
+  template:
+    metadata:
+      labels:
+        app: adminer
+    spec:
+      containers:
+        - name: adminer
+          image: adminer
+          resources:
+            limits:
+              cpu: "1"
+              memory: 500Mi
+            requests:
+              cpu: "0.5"
+              memory: 250Mi

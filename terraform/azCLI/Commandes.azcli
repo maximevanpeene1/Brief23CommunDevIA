@@ -1,0 +1,17 @@
+#login sur le cluster
+az aks get-credentials --resource-group rg-usable-cheetah --name cluster-charmed-shiner
+
+#Installation de ingress-nginx
+$NAMESPACE="default"
+helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+helm repo update
+helm install ingress-nginx ingress-nginx/ingress-nginx --create-namespace --namespace $NAMESPACE --set controller.service.annotations."service\.beta\.kubernetes\.io/azure-load-balancer-health-probe-request-path"=/healthz
+
+#Déploiement ingress
+kubectl apply -f .\yaml\customweb-ingress.yaml
+
+#Déploiement web
+kubectl apply -f .\yaml\customweb-deploy-rc.yaml
+
+#Déploiement svc
+kubectl apply -f .\yaml\customweb-svc.yaml

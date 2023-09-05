@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web
+  namespace: my-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: web
+  template:
+    metadata:
+      labels:
+        app: web
+    spec:
+      containers:
+      - name: web
+        image: gotoxlapoch/django:v3
+        resources:
+          limits:
+            cpu: "1"
+            memory: "512Mi"
+          requests:
+            cpu: "0.5"
+            memory: "256Mi"
+        command: ["bash", "-c"]
+        args:
+          - |
+            python /app/manage.py makemigrations
+            python /app/manage.py migrate
+            python /app/src/postgre_patient_import.py
+            python /app/src/elastic_mapping_import.py
+            python /app/manage.py runserver 0.0.0.0:8000
+        envFrom:
+        - configMapRef:
+            name: web-env-config
+        - secretRef:
+            name: web-env-secret
+        ports:
+        - containerPort: 8000
